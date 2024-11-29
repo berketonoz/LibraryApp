@@ -18,17 +18,15 @@ const collectionPath = path.join(
   __dirname,
   "./Library Case API Collection.postman_collection.json"
 );
-const usersPath = path.join(__dirname, "./data/Users.json");
 const collection = JSON.parse(fs.readFileSync(collectionPath, "utf8"));
-const users = JSON.parse(fs.readFileSync(usersPath, "utf8"));
 
-/* app.get("/test/collection/:id", (req, res) => {
+app.get("/test/collection/:id", (req, res) => {
   const id = req.params.id;
   res.json(JSON.parse(collection.item[id].response[0].body));
-}); */
+});
 
 // Routes
-app.get("/db/users", async (req, res) => {
+app.get("/users", async (req, res) => {
   try {
     const users = await User.findAll();
     res.json(users);
@@ -38,7 +36,7 @@ app.get("/db/users", async (req, res) => {
   }
 });
 
-app.get("/db/users/:id", async (req, res) => {
+app.get("/users/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const user = await User.findByPk(id);
@@ -49,7 +47,7 @@ app.get("/db/users/:id", async (req, res) => {
   }
 });
 
-app.get("/db/books", async (req, res) => {
+app.get("/books", async (req, res) => {
   try {
     const books = await Book.findAll();
     res.json(books);
@@ -59,7 +57,7 @@ app.get("/db/books", async (req, res) => {
   }
 });
 
-app.get("/db/books/:id", async (req, res) => {
+app.get("/books/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const book = await Book.findByPk(id);
