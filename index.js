@@ -17,7 +17,7 @@ app.get("/users", (req, res) => {
 
 app.get("/test/collection/:id", (req, res) => {
     const id = req.params.id;
-    res.json(apiCollection.item[id]);
+    res.json(JSON.parse(apiCollection.item[id].response[0].body));
 });
 
 app.listen(port, () => {
