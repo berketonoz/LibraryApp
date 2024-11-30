@@ -9,7 +9,7 @@ router.get('/books', Controller.getBooks);
 router.get('/books/:id', Controller.getBook);
 router.post('/users', Controller.createUser);
 router.post('/books', Controller.createBook);
-router.post('/users/:id/borrow/:bookId', Controller.borrowBook);
-router.post('/users/:id/return/:bookId', Controller.returnBook);
+router.post('/users/:user_id/borrow/:book_id', Controller.borrowBook);
+router.post('/users/:user_id/return/:book_id', Controller.returnBook);
 
 export default router;
