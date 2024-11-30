@@ -1,27 +1,23 @@
-const path = require("path");
-const nodeExternals = require("webpack-node-externals");
+const path = require('path');
 
 module.exports = {
-  entry: "./index.js", // Entry point of your app
-  target: "node", // Specifies that we're building for Node.js
-  externals: [nodeExternals()], // Exclude node_modules
-  output: {
-    path: path.resolve(__dirname, "dist"), // Output folder
-    filename: "bundle.js", // Output file name
-  },
+  entry: './src/server.ts',           // Entry point of your application
+  target: 'node',                     // Specifies that the target is Node.js
+  mode: 'production',                 // or 'development' for development mode
   module: {
     rules: [
       {
-        test: /\.js$/, // Apply this rule to .js files
-        exclude: /node_modules/, // Ignore node_modules
-        use: {
-          loader: "babel-loader", // Use Babel to transpile
-        },
-      },
-    ],
+        test: /\.ts$/,                // Matches .ts files
+        use: 'babel-loader',          // Use Babel loader for transpilation
+        exclude: /node_modules/       // Exclude dependencies
+      }
+    ]
   },
   resolve: {
-    extensions: [".js"], // Resolve these extensions
+    extensions: ['.ts', '.js']        // Resolve these extensions
   },
-  mode: "production", // Change to "development" during development
+  output: {
+    filename: 'bundle.js',            // Output file name
+    path: path.resolve(__dirname, 'dist') // Output directory ('dist' folder)
+  }
 };
