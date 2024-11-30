@@ -6,6 +6,7 @@ import sequelize from '../config/database';
 class Book extends Model {
   public id!: number;
   public name!: string;
+  public average_score!: number | null;
 }
 
 Book.init(
@@ -17,6 +18,10 @@ Book.init(
     },
     name: {
       type: DataTypes.STRING(128), // DataTypes.STRING is sufficient
+      allowNull: false,
+    },
+    average_score: {
+      type: DataTypes.FLOAT, // Use FLOAT for floating-point number
       allowNull: false,
     },
   },
