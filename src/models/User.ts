@@ -20,6 +20,7 @@ User.init(
   },
   {
     tableName: 'users',
+    timestamps: false, // To disable sequelize's timestamp feature
     sequelize,
   }
 );
