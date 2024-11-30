@@ -42,6 +42,7 @@ export function validateReturnBook(
 ) {
   const schema = Joi.object({
     score: Joi.number().required(),
+    mode: Joi.string().optional(),
   });
 
   const { error } = schema.validate(req.body);
