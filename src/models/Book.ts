@@ -28,7 +28,7 @@ Book.init(
     },
     average_score: {
       type: DataTypes.FLOAT, // Use FLOAT for floating-point number
-      allowNull: false,
+      allowNull: true,
     },
   },
   {
