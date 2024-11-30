@@ -2,11 +2,13 @@
   "name": "libraryapp",
   "version": "1.0.0",
   "description": "Invent Analytics Backend Developer Case - Library Management Application",
-  "main": "index.js",
+  "main": "server.ts",
   "scripts": {
+    "build": "webpack",
     "start": "node dist/bundle.js",
-    "build": "webpack --config webpack.config.js",
-    "dev": "webpack --config webpack.config.js --mode development --watch"
+    "dev": "nodemon",
+    "lint": "eslint 'src/**/*.{ts,js}'",
+    "lint:fix": "eslint 'src/**/*.{ts,js}' --fix"
   },
   "repository": {
     "type": "git",
@@ -19,6 +21,7 @@
   },
   "homepage": "https://github.com/berketonoz/LibraryApp#readme",
   "dependencies": {
+    "@types/hapi__joi": "^17.1.15",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "express": "^4.21.1",
@@ -28,8 +31,19 @@
     "sequelize": "^6.37.5"
   },
   "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
     "@types/express": "^5.0.0",
     "@types/joi": "^17.2.2",
+    "@types/node": "^22.10.1",
+    "@typescript-eslint/eslint-plugin": "^8.16.0",
+    "@typescript-eslint/parser": "^8.16.0",
+    "babel-loader": "^9.2.1",
+    "eslint": "^9.16.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "nodemon": "^3.1.7",
+    "prettier": "^3.4.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2",
     "webpack": "^5.96.1",
