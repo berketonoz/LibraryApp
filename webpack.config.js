@@ -1,9 +1,13 @@
+// webpack.config.js
+
 const path = require('path');
+const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
-  entry: './src/server.ts',           // Entry point of your application
-  target: 'node',                     // Specifies that the target is Node.js
-  mode: 'production',                 // or 'development' for development mode
+  entry: './src/server.ts',
+  target: 'node', // Important for Node.js apps
+  externals: [nodeExternals()], // Exclude node_modules
+  mode: 'development',
   module: {
     rules: [
       {
@@ -14,10 +18,10 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.ts', '.js']        // Resolve these extensions
+    extensions: ['.ts'],
   },
   output: {
-    filename: 'bundle.js',            // Output file name
-    path: path.resolve(__dirname, 'dist') // Output directory ('dist' folder)
-  }
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
 };
