@@ -27,14 +27,17 @@ cd LibraryApp
 
 ### 2. Set Up Environment Variables
 
-Create a **.env** file in the root directory to configure the database and application settings. Example **.env** file:
+Create a **.env**, if not existent, file in the root directory to configure the database and application settings. Example **.env** file:
 
 ```dotenv
-DB_HOST=mysql_container
+DB_HOST=mysql_db
 DB_PORT=3306
-DB_USER=user
-DB_PASSWORD=password
-DB_NAME=library_db
+DB_USER=root
+DB_PASSWORD=rootroot
+DB_NAME=library_management
+
+MYSQL_ROOT_PASSWORD=rootroot
+MYSQL_DATABASE=library_management
 ```
 
 Ensure the variables match those in the **docker-compose.yml** file.
@@ -76,13 +79,14 @@ Once the containers are running, verify that the app is accessible:
 ```bash
 LibraryApp/
 ├── src/                # Source code
+│   ├── config/         # Config files
 │   ├── models/         # Sequelize models
 │   ├── routes/         # API routes
 │   ├── controllers/    # Endpoint logic
 │   └── server.ts       # App entry point
 ├── Dockerfile          # Dockerfile for Node.js app
 ├── docker-compose.yml  # Docker Compose configuration
-├── .env.example        # Example environment variables
+├── .env                # Example environment variables
 ├── package.json        # Dependencies and scripts
 └── README.md           # Documentation
 ```
