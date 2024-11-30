@@ -179,22 +179,38 @@ class Controller {
     }
   }
 
-  static async createUser(req: Request, res: Response) {
-    // Validate request body
-    // Create new user
+  static async createUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      // Validate request body
+      // Create new user
+    } catch (error) {
+      
+    }
   }
 
-  static async createBook(req: Request, res: Response) {
-    // Validate request body
-    // Create new user
+  static async createBook(req: Request, res: Response, next: NextFunction) {
+    try {
+      // Validate request body
+      // Create new user
+    } catch (error) {
+      next(error);
+    }
   }
 
-  static async borrowBook(req: Request, res: Response) {
-    // Implement borrow logic
+  static async borrowBook(req: Request, res: Response, next: NextFunction) {
+    try {
+      // Implement borrow logic
+    } catch (error) {
+      next(error);
+    }
   }
 
-  static async returnBook(req: Request, res: Response) {
-    // Implement return logic
+  static async returnBook(req: Request, res: Response, next: NextFunction) {
+    try {
+      // Implement return logic
+    } catch (error) {
+      next(error);
+    }
   }
 }
 
