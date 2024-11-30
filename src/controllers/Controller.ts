@@ -3,6 +3,26 @@ import User from '../models/User';
 import Book from '../models/Book';
 import Borrow from '../models/Borrow';
 
+// write me a function to get the response body from the request and response in the format below
+function formatResponseBody(
+  name: string,
+  req: Request,
+  res: Response,
+  body: any[] | null = null,
+) {
+  return {
+    name: name,
+    originalRequest: {
+      method: req.method,
+      header: req.headers,
+      url: req.originalUrl,
+    },
+    status: res.statusCode === 200 ? 'OK' : 'Error',
+    code: res.statusCode,
+    body: JSON.stringify(body, null, 4),
+  };
+}
+
 class Controller {
   static async getUsers(req: Request, res: Response, next: NextFunction) {
     try {
@@ -12,19 +32,7 @@ class Controller {
       });
 
       // Construct the response body to include originalRequest
-      const responseBody = {
-        name: 'Getting user list with ids and names',
-        originalRequest: {
-          method: req.method,
-          header: req.headers,
-          url: req.originalUrl,
-        },
-        status: res.statusCode === 200 ? 'OK' : 'Error',
-        code: res.statusCode,
-        header: res.getHeaders(),
-        cookies: res.getHeaders()['set-cookie'],
-        body: JSON.stringify(users, null, 4),
-      };
+      const responseBody = formatResponseBody('Getting user list with ids and names', req, res, users);
 
       res.json(responseBody);
     } catch (error) {
@@ -37,8 +45,16 @@ class Controller {
   }
 
   static async getBooks(req: Request, res: Response, next: NextFunction) {
-    const books = await Book.findAll({ attributes: ['id', 'name'] });
-    res.status(200).json(books);
+    try {
+      const books = await Book.findAll({ attributes: ['id', 'name'] });
+
+      const responseBody = formatResponseBody('Getting book list', req, res, books);
+
+      res.json(responseBody);
+    } catch (error) {
+      console.error('Error fetching books:', error);
+      res.status(500).json({ error: 'Failed to fetch books' });
+    }
   }
 
   static async getBook(req: Request, res: Response, next: NextFunction) {
