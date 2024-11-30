@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { User, Book, Borrow } from '../models/associations';
+import { Op } from 'sequelize';
 
 // write me a function to get the response body from the request and response in the format below
 function formatResponseBody(
@@ -250,8 +251,12 @@ class Controller {
       });
 
       // Construct the response body to include originalRequest
-      const responseBody = formatResponseBody('User borrowed a book successfully', req, res);
-      
+      const responseBody = formatResponseBody(
+        'User borrowed a book successfully',
+        req,
+        res,
+      );
+
       res.status(200).json(responseBody); // Changed to 200 due to 204 not returning a body !
       return;
     } catch (error) {
@@ -261,7 +266,66 @@ class Controller {
 
   static async returnBook(req: Request, res: Response, next: NextFunction) {
     try {
-      // Implement return logic
+      const { score } = req.body;
+      const userId = parseInt(req.params.user_id);
+      const bookId = parseInt(req.params.book_id);
+
+      // Check if user exists
+      const user = await User.findByPk(userId);
+      if (!user) {
+        res.status(500).json({ error: 'User not found' });
+        return;
+      }
+
+      // Check if book exists
+      const book = await Book.findByPk(bookId);
+      if (!book) {
+        res.status(500).json({ error: 'Book not found' });
+        return;
+      }
+
+      // Find the borrow record
+      const borrow = await Borrow.findOne({
+        where: {
+          user_id: userId,
+          book_id: bookId,
+          return_date: null,
+        },
+      });
+      if (!borrow) {
+        res
+          .status(500)
+          .json({ error: 'Borrow record not found or book already returned' });
+        return;
+      }
+
+      borrow.return_date = new Date();
+      borrow.user_score = score;
+      await borrow.save();
+
+      // Update the book's average rating
+      const borrows = await Borrow.findAll({
+        where: { book_id: bookId, return_date: { [Op.ne]: null } },
+      });
+
+      if (borrows.length > 0) {
+        const totalScore = borrows.reduce(
+          (sum, borrow) => sum + borrow.user_score,
+          0,
+        );
+        const averageScore = totalScore / borrows.length;
+
+        book.average_score = averageScore;
+        await book.save();
+      }
+
+      const responseBody = formatResponseBody(
+        'User returning a book with his score',
+        req,
+        res,
+      );
+
+      res.status(200).json(responseBody);
     } catch (error) {
       next(error);
     }
