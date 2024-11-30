@@ -1,5 +1,7 @@
 import { Model, DataTypes } from "sequelize";
 import sequelize from '../config/database';
+import User from './User';
+import Book from './Book';
 
 class Borrow extends Model {
   public id!: number;
@@ -8,6 +10,9 @@ class Borrow extends Model {
   public borrow_date!: Date;
   public return_date!: Date;
   public user_score!: number;
+
+  public book?: Book;
+  public user?: User;
 }
 
 Borrow.init(
@@ -44,6 +49,7 @@ Borrow.init(
   },
   {
     tableName: "borrows",
+    timestamps: false,
     sequelize,
   }
 );

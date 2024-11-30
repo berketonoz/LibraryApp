@@ -1,12 +1,18 @@
 // src/models/Book.ts
 
-import { Model, DataTypes } from 'sequelize';
+import { Model, DataTypes, Association } from 'sequelize';
 import sequelize from '../config/database';
+import Borrow from './Borrow';
 
 class Book extends Model {
   public id!: number;
   public name!: string;
   public average_score!: number | null;
+  public borrows?: Borrow[];
+
+  public static associations: {
+    borrows: Association<Book, Borrow>;
+  };
 }
 
 Book.init(
