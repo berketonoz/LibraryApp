@@ -193,6 +193,7 @@ class Controller {
       const responseBody = formatResponseBody('Creating a user', req, res);
 
       res.status(201).json(responseBody);
+      return;
     } catch (error) {}
   }
 
@@ -205,6 +206,7 @@ class Controller {
       const responseBody = formatResponseBody('Creating a book', req, res);
 
       res.status(201).json(responseBody);
+      return;
     } catch (error) {
       next(error);
     }
@@ -213,6 +215,45 @@ class Controller {
   static async borrowBook(req: Request, res: Response, next: NextFunction) {
     try {
       // Implement borrow logic
+      const userId = req.params.user_id;
+      const bookId = req.params.book_id;
+
+      // Check if user exists
+      const user = await User.findByPk(userId);
+      if (!user) {
+        res.status(500).json({ error: 'User not found' });
+        return;
+      }
+
+      // Check if book exists
+      const book = await Book.findByPk(bookId);
+      if (!book) {
+        res.status(500).json({ error: 'Book not found' });
+        return;
+      }
+
+      // Check if the book is already borrowed
+      const existingBorrow = await Borrow.findOne({
+        where: {
+          book_id: bookId,
+          return_date: null,
+        },
+      });
+      if (existingBorrow) {
+        res.status(500).json({ error: 'Book is already borrowed' });
+        return;
+      }
+
+      await Borrow.create({
+        user_id: userId,
+        book_id: bookId,
+      });
+
+      // Construct the response body to include originalRequest
+      const responseBody = formatResponseBody('User borrowed a book successfully', req, res);
+      
+      res.status(200).json(responseBody); // Changed to 200 due to 204 not returning a body !
+      return;
     } catch (error) {
       next(error);
     }
