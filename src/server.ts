@@ -457,7 +457,6 @@ sequelize
   import express from 'express';
   import bodyParser from 'body-parser';
   import sequelize from './config/database';
-  import { User, Book } from './models'; // Import models to ensure they're registered
   
   const app = express();
   app.use(bodyParser.json());
