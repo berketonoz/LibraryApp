@@ -1,0 +1,45 @@
+services:
+  # MySQL service
+  mysql_db:
+    container_name: db_container
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootroot
+      - MYSQL_DATABASE=library_management
+    ports:
+      - 3306:3306  # Expose MySQL on localhost:3306 (if needed)
+    restart: always
+    volumes:
+      - mysql_data:/var/lib/mysql  # Correct MySQL data directory
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Node API service
+  api:
+    image: libraryapp
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DB_HOST=mysql_db
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=rootroot
+      - DB_NAME=library_management
+    depends_on:
+      - mysql_db
+    ports:
+      - 3000:3000
+    networks:
+      - app-network
+
+volumes:
+  mysql_data:
+
+networks:
+  app-network:
