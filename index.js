@@ -3,6 +3,8 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url"; // Import this to work with import.meta.url
 import { sequelize, User, Book, Borrow } from "./sequelize.js";
+import { Op } from "sequelize";
+
 
 // Create __dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
@@ -39,11 +41,51 @@ app.get("/users", async (req, res) => {
 app.get("/users/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    const user = await User.findByPk(id);
-    res.json(user);
+
+    // Fetch user along with their borrow history
+    const user = await User.findByPk(id, {
+      include: [
+        {
+          model: Borrow,
+          as: "borrows",
+          include: [{ model: Book, as: "book" }],
+        },
+      ],
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Separate borrows into past and present
+    const pastBorrows = [];
+    const presentBorrows = [];
+
+    user.borrows.forEach((borrow) => {
+      if (borrow.return_date) {
+        pastBorrows.push({
+          name: borrow.book.name,
+          userScore: borrow.user_score,
+        });
+      } else {
+        presentBorrows.push({
+          name: borrow.book.name,
+        });
+      }
+    });
+
+    // Format the response
+    res.json({
+      id: user.id,
+      name: user.name,
+      books: {
+        past: pastBorrows,
+        present: presentBorrows,
+      },
+    });
   } catch (error) {
-    console.error("Error fetching user:", error);
-    res.status(500).json({ error: "Failed to fetch user" });
+    console.error("Error fetching user details:", error);
+    res.status(500).json({ error: "Failed to fetch user details" });
   }
 });
 
@@ -91,6 +133,68 @@ app.post("/books", async (req, res) => {
   } catch (error) {
     console.error("Error creating book:", error);
     res.status(500).json({ error: "Failed to create book" });
+  }
+});
+
+app.post("/users/:user_id/borrow/:book_id", async (req, res) => {
+  try {
+    const borrow = await Borrow.create({
+      user_id: req.params.user_id,
+      book_id: req.params.book_id,
+    });
+
+    res.status(201).json({
+      message: "Book borrowed successfully",
+      borrow,
+    });
+  } catch (error) {
+    console.error("Error creating book:", error);
+    res.status(500).json({ error: "Failed to create book" });
+  }
+});
+
+app.post("/users/:user_id/return/:book_id", async (req, res) => {
+  try {
+    const { mode, score } = req.body;
+    const user_id = parseInt(req.params.user_id);
+    const book_id = parseInt(req.params.book_id);
+    const borrow = await Borrow.findOne({
+      where: {
+        user_id: user_id,
+        book_id: book_id,
+      },
+    });
+    if (!borrow) {
+      return res.status(404).json({ error: "Borrow record not found" });
+    }
+    borrow.return_date = new Date();
+    borrow.user_score = score;
+    await borrow.save();
+
+    // After returning a book, update the book's average rating
+    const borrows = await Borrow.findAll({
+      where: { book_id, return_date: { [Op.ne]: null } },
+    });
+
+    if (borrows.length === 0) return;
+    
+    const totalScore = borrows.reduce(
+      (sum, borrow) => sum + borrow.user_score,
+      0
+    );
+    const averageScore = totalScore / borrows.length;
+
+    const book = await Book.findByPk(book_id);
+    book.average_score = averageScore;
+    await book.save();
+
+    res.status(200).json({
+      message: "Book returned successfully",
+      borrow,
+    });
+  } catch (error) {
+    console.error("Error returning book:", error);
+    res.status(500).json({ error: "Failed to return book" });
   }
 });
 
