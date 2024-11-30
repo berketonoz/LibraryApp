@@ -1,14 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
-import User from '../models/User';
-import Book from '../models/Book';
-import Borrow from '../models/Borrow';
+import { User, Book, Borrow } from '../models/associations';
 
 // write me a function to get the response body from the request and response in the format below
 function formatResponseBody(
   name: string,
   req: Request,
   res: Response,
-  body: any[] | null = null,
+  body: any = null,
 ) {
   return {
     name: name,
@@ -41,14 +39,89 @@ class Controller {
   }
 
   static async getUser(req: Request, res: Response, next: NextFunction) {
-    // Implement fetching user with past and present books
+    try {
+      const id = req.params.id;
+
+      // Fetch user along with their borrow history
+      const user = await User.findByPk(id, {
+        attributes: ['id', 'name'],
+        include: [
+          {
+            model: Borrow,
+            as: 'borrows',
+            include: [
+              {
+                model: Book,
+                as: 'book',
+                attributes: ['name'],
+              },
+            ],
+          },
+        ],
+      });
+
+      if (!user) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+
+      // Separate borrows into past and present
+      const pastBorrows: any[] = [];
+      const presentBorrows: any[] = [];
+
+      user.borrows?.forEach((borrow) => {
+        if (borrow.return_date) {
+          pastBorrows.push({
+            name: borrow.book!.name,
+            userScore: borrow.user_score,
+          });
+        } else {
+          presentBorrows.push({
+            name: borrow.book!.name,
+          });
+        }
+      });
+
+      // Format the response to match the Postman Collection example
+      const userResponse = {
+        id: user.id,
+        name: user.name,
+        books: {
+          past: pastBorrows,
+          present: presentBorrows,
+        },
+      };
+
+      const name =
+        pastBorrows.length === 0 && presentBorrows.length === 0
+          ? 'Getting a user with no borrow history'
+          : 'Getting a user with his past and current book borrow list';
+
+      // Construct the response body to include originalRequest
+      const responseBody = formatResponseBody(
+        name,
+        req,
+        res,
+        JSON.stringify(userResponse),
+      );
+
+      res.json(responseBody);
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+      res.status(500).json({ error: 'Failed to fetch user details' });
+    }
   }
 
   static async getBooks(req: Request, res: Response, next: NextFunction) {
     try {
       const books = await Book.findAll({ attributes: ['id', 'name'] });
 
-      const responseBody = formatResponseBody('Getting book list', req, res, books);
+      const responseBody = formatResponseBody(
+        'Getting book list',
+        req,
+        res,
+        books,
+      );
 
       res.json(responseBody);
     } catch (error) {
