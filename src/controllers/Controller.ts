@@ -30,7 +30,12 @@ class Controller {
       });
 
       // Construct the response body to include originalRequest
-      const responseBody = formatResponseBody('Getting user list with ids and names', req, res, users);
+      const responseBody = formatResponseBody(
+        'Getting user list with ids and names',
+        req,
+        res,
+        users,
+      );
 
       res.json(responseBody);
     } catch (error) {
@@ -183,9 +188,12 @@ class Controller {
     try {
       // Validate request body
       // Create new user
-    } catch (error) {
-      
-    }
+      await User.create(req.body);
+      // Construct the response body to include originalRequest
+      const responseBody = formatResponseBody("Creating a user", req, res);
+
+      res.status(201).json(responseBody);
+    } catch (error) {}
   }
 
   static async createBook(req: Request, res: Response, next: NextFunction) {
