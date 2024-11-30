@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "Invent Analytics Backend Developer Case - Library Management Application",
   "main": "index.js",
-  "type": "module",
   "scripts": {
-    "test": "node --trace-warnings --watch index.js"
+    "start": "node dist/bundle.js",
+    "build": "webpack --config webpack.config.js",
+    "dev": "webpack --config webpack.config.js --mode development --watch"
   },
   "repository": {
     "type": "git",
@@ -24,13 +25,15 @@
     "joi": "^17.13.3",
     "knex": "^3.1.0",
     "mysql2": "^3.11.5",
-    "sequelize": "^6.37.5",
-    "webpack": "^5.96.1"
+    "sequelize": "^6.37.5"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/joi": "^17.2.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "webpack": "^5.96.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-node-externals": "^3.0.0"
   }
 }
