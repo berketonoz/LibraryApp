@@ -23,6 +23,6 @@ const defineBorrow = (sequelize) => {
       timestamps: false, // Disable createdAt and updatedAt
     }
   );
-}
+};
 
 export default defineBorrow;
